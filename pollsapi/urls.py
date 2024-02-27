@@ -15,8 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include # Added include import
+from django.urls import re_path # Added re_path import for regular expression URL patterns
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls), # Admin URL
+    re_path(r'^', include('polls.urls')), # Include polls app URLs with a prefix
 ]
+
+# Explanation:
+# - The first pattern directs requests to the Django admin site.
+# - The second pattern includes URLs from the 'polls' app, prefixed with 'polls/'.
+#   This means that any URL starting with 'polls/' will be handled by the URLs defined in 'polls.urls'.
+#   This allows for better organization and separation of concerns in your URL configuration.
