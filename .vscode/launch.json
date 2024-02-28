@@ -5,16 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Customize by Kosmar",
-            "type": "debugpy",
-            // "type": "python",
+            "name": "Kosmar: Django Debugger",
+            "type": "python",
             "request": "launch",
-            // "program": "${file}",
-            "program": "D:/_Software Development/django/pollsapi/manage.py",
-            // "console": "integratedTerminal",
-            "console": "internalConsole",
-            // "args": "${command:pickArgs}"
-            "args": ["runserver"]
-        }
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "runserver",
+                "--noreload",
+                "--nothreading"
+            ],
+            "django": true
+        },
     ]
 }
