@@ -3,9 +3,11 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework import viewsets
+from rest_framework.exceptions import PermissionDenied
 from .models import Poll, Choice
 from .serializers import PollSerializer, ChoiceSerializer, VoteSerializer, UserSerializer
 from django.contrib.auth import authenticate
+
 
 class LoginView(APIView):
     permission_classes = ()
@@ -32,6 +34,13 @@ class ChoiceList(generics.ListCreateAPIView):
         queryset = Choice.objects.filter(poll_id=self.kwargs["pk"])
         return queryset
 
+    def post(self, request, *args, **kwargs):
+        poll = Poll.objects.get(pk=self.kwargs["pk"])
+        if not request.user == poll.created_by:
+            raise PermissionDenied("You can not create choice for this poll.")
+        
+        return super().post(request, *args, **kwargs)
+
 class CreateVote(APIView):
     serializer_class = VoteSerializer
     def post(self, request, pk, choice_pk):
@@ -45,8 +54,12 @@ class CreateVote(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 class PollViewSet(viewsets.ModelViewSet):
-    queryset = Poll.objects.all()
-    serializer_class = PollSerializer
+    def destroy(self, request, *args, **kwargs):
+        poll = Poll.objects.get(pk=self.kwargs["pk"])
+        if not request.user == poll.created_by:
+            raise PermissionDenied("You can not delete this poll.")
+        
+        return super().destroy(request, *args, **kwargs)
     
 class UserCreate(generics.CreateAPIView):
     authentication_classes = ()
